@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAZY CLICKER v1.0.0-PRO</title>
+    <style>
+        :root { --bg: #f0f2f5; --card: white; --text: #1e293b; --subtext: #64748b; --accent: #2563eb; }
+        .dark-mode { --bg: #1a1c1e; --card: #2d2f31; --text: #f0f2f5; --subtext: #94a3b8; --accent: #3b82f6; }
+
+        body { 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; 
+            font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; 
+            transition: all 0.3s ease; user-select: none; overflow: hidden;
+        }
+        body.auto-active { background: #39FF14 !important; }
+        body.auto-active .clicker-card { animation: shake 0.1s infinite; border: 4px solid #1e293b; }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            50% { transform: translate(-1px, -2px) rotate(-1deg); }
+            100% { transform: translate(1px, -1px) rotate(1deg); }
+        }
+
+        h1 { color: var(--text); margin-bottom: 10px; letter-spacing: 2px; }
+        .clicker-card { text-align: center; background: var(--card); padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); width: 360px; position: relative; }
+        
+        #boss-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background-color: white; 
+            background-image: url('https://unsplash.com'); 
+            background-size: cover; background-position: center; z-index: 9999; 
+        }
+
+        .header-btns { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
+        .icon-btn { background: #64748b; color: white; border: none; border-radius: 5px; padding: 5px 8px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+        #radical-display { font-size: 3.5rem; font-weight: bold; color: var(--accent); min-height: 4.5rem; }
+        #warning-banner { display: none; background: #fbbf24; color: #78350f; font-size: 0.7rem; padding: 5px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; }
+        #alltime-display { font-size: 0.9rem; color: var(--subtext); margin-bottom: 10px; font-weight: bold; }
+        .btn-click { background: var(--accent); color: white; width: 100%; padding: 1.2rem; font-size: 1.2rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px #1d4ed8; }
+        .btn-click:active { transform: scale(0.96); box-shadow: 0 0 #1d4ed8; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card); color: var(--text); padding: 25px; border-radius: 15px; width: 380px; text-align: left; max-height: 85vh; overflow-y: auto; }
+        .modal-content h2 { margin-top: 0; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 5px; }
+        .modal-content h3 { font-size: 1rem; margin-bottom: 5px; color: var(--accent); }
+        .modal-content p, .modal-content li { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+        .footer { margin-top: 20px; font-size: 0.8rem; color: #64748b; font-weight: bold; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="boss-overlay"></div>
+
+<h1>CRAZY CLICKER</h1>
+
+<div class="clicker-card">
+    <div class="header-btns">
+        <button class="icon-btn" onclick="toggleModal('settings-modal', true)">⚙️</button>
+        <button class="icon-btn" onclick="toggleModal('rules-modal', true)">?</button>
+    </div>
+    <div id="warning-banner">⚠️ INACTIVITY WARNING: Auto-Clicker Lock Imminent!</div>
+    <div id="radical-display">√0</div>
+    <div id="standard-display" style="font-size: 1rem; color: var(--subtext);">Session: 0</div>
+    <div id="alltime-display">All-Time: 0</div>
+    <div id="power-level" style="font-size: 0.75rem; font-weight: bold; color: #10b981; margin-bottom: 1rem;">Click Power: +1</div>
+    <div id="auto-container">
+        <button id="auto-btn" class="btn-auto" onclick="startAutoClicker()" style="background: #db2777; color: white; width: 100%; padding: 10px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">START AUTO (60s)</button>
+        <div id="auto-timer" style="font-size:0.7rem; color:#be185d; font-weight: bold; margin-top:5px;">READY</div>
+    </div>
+    <button class="btn-click" onclick="manualIncrement()">CLICK!</button>
+    <button onclick="resetSession()" style="font-size:0.7rem; padding:8px; background:#ef4444; color:white; border:none; border-radius:5px; margin-top:10px; cursor:pointer; width:100%;">Reset Session</button>
+</div>
+
+<div class="footer">Made By: Avi Shayowitz</div>
+
+<div id="settings-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Settings</h2>
+        <label><input type="checkbox" id="sfx-on" checked> SFX Enabled</label><br><br>
+        <label><input type="checkbox" id="dark-toggle" onchange="toggleDark()"> Dark Mode</label><br><br>
+        <input type="text" id="cheat-box" placeholder="Enter code..." oninput="checkCheat()" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; background:transparent; color:inherit;">
+        <button onclick="sendFeedback()" style="margin-top:15px; width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; background:var(--accent); color:white; cursor:pointer;">✉ Email Avi</button>
+        <button onclick="nuclearReset()" style="background:black; color:red; width:100%; padding:10px; margin-top:10px; border:none; border-radius:8px; cursor:pointer;">NUCLEAR RESET</button>
+        <button onclick="toggleModal('settings-modal', false)" style="width:100%; margin-top:10px; padding:10px; border-radius:8px; cursor:pointer; background:#64748b; color:white; border:none;">Close</button>
+    </div>
+</div>
+
+<div id="rules-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Official Game Guide</h2>
+        
+        <h3>1. Radical Score Logic</h3>
+        <p>Your session score is automatically converted into its <b>Simplified Radical Form</b>. For example, a score of 12 displays as 2√3. This is purely visual and does not affect your math!</p>
+
+        <h3>2. Progression & Power</h3>
+        <p>Your Click Power scales based on your <b>Total Career Clicks</b>:</p>
+        <ul>
+            <li><b>Bronze:</b> 0 - 999 clicks (+1 Power)</li>
+            <li><b>Silver:</b> 1,000 - 9,999 clicks (+10 Power)</li>
+            <li><b>Gold:</b> 10,000+ clicks (+20 Power)</li>
+        </ul>
+
+        <h3>3. The Auto-Clicker Ability</h3>
+        <p>Unlock the <b>Ultimate Auto-Clicker</b> by reaching 100 Billion All-Time clicks. Once active, it generates 10 Clicks Per Second (CPS) for 60 seconds. <i>Cooldown: 10 Minutes.</i></p>
+
+        <h3>4. Stealth & Safety</h3>
+        <p><b>Boss Mode:</b> Press <b>'B'</b> to instantly hide the game behind math notes. This also mutes all audio.</p>
+        <p><b>Manual Cancel:</b> Clicking the manual button while the Auto-Clicker is active will immediately abort the session and start the cooldown.</p>
+
+        <h3>5. Inactivity Rules</h3>
+        <p>To keep the Auto-Clicker unlocked, you must remain active. If you do not click for 48 hours, a warning appears. At <b>72 hours</b>, the ability locks.</p>
+
+        <hr>
+        <p style="font-size:0.75rem; text-align:center;">Contact Avi: <b>avishayowitz@gmail.com</b></p>
+        <button onclick="toggleModal('rules-modal', false)" style="width:100%; padding:10px; cursor:pointer; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:bold;">Close Guide</button>
+    </div>
+</div>
+
+<audio id="click-sfx" src="https://pixabay.com"></audio>
+
+<script>
+    let bossActive = false;
+    let count = 0, allTimeCount = parseInt(localStorage.getItem('allTimeCount')) || 0;
+    let usedCodes = JSON.parse(localStorage.getItem('usedCodes')) || {};
+    let lastClickTime = parseInt(localStorage.getItem('lastActivity')) || Date.now();
+    let autoActive = false, autoInterval = null, lastAutoTime = 0;
+
+    document.onkeydown = function(e) {
+        if (e.keyCode == 66) { 
+            bossActive = !bossActive;
+            document.getElementById('boss-overlay').style.display = bossActive ? 'block' : 'none';
+        }
+        if(e.keyCode == 123) return false;
+        if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false;
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+    };
+
+    function increment(isAuto = false) {
+        if(!isAuto && !bossActive && document.getElementById('sfx-on').checked) {
+            let sfx = document.getElementById('click-sfx');
+            sfx.playbackRate = 0.8 + Math.random() * 0.6;
+            sfx.currentTime = 0; sfx.play().catch(()=>{});
+        }
+        let p = allTimeCount >= 10000 ? 20 : (allTimeCount >= 1000 ? 10 : 1);
+        count += p; allTimeCount += p;
+        if(!isAuto) { lastClickTime = Date.now(); localStorage.setItem('lastActivity', lastClickTime); }
+        localStorage.setItem('allTimeCount', allTimeCount);
+        updateUI();
+    }
+
+    function manualIncrement() { if(autoActive) { stopAutoClicker(); return; } increment(false); }
+
+    function updateUI() {
+        document.getElementById('radical-display').innerText = simplifyRadical(count);
+        document.getElementById('standard-display').innerText = `Session: ${count}`;
+        document.getElementById('alltime-display').innerText = `All-Time: ${allTimeCount.toLocaleString()}`;
+        document.getElementById('power-level').innerText = `Click Power: +${allTimeCount >= 10000 ? 20 : (allTimeCount >= 1000 ? 10 : 1)}`;
+        const diff = Date.now() - lastClickTime;
+        document.getElementById('warning-banner').style.display = (diff > 172800000 && diff < 259200000) ? 'block' : 'none';
+        if (allTimeCount >= 100000000000 && diff < 259200000) document.getElementById('auto-container').style.display = 'block';
+        else document.getElementById('auto-container').style.display = 'none';
+    }
+
+    function startAutoClicker() {
+        autoActive = true; lastAutoTime = Date.now();
+        document.body.classList.add('auto-active');
+        document.getElementById('auto-btn').disabled = true;
+        let d = 60;
+        autoInterval = setInterval(() => { for(let i=0; i<10; i++) increment(true); d--; document.getElementById('auto-timer').innerText = `ACTIVE: ${d}s`; if(d <= 0) stopAutoClicker(); }, 1000);
+    }
+
+    function stopAutoClicker() { clearInterval(autoInterval); autoActive = false; document.body.classList.remove('auto-active'); updateAutoCooldown(); }
+
+    function updateAutoCooldown() {
+        if (autoActive) return;
+        let rem = Math.ceil((600000 - (Date.now() - lastAutoTime)) / 1000);
+        if (rem > 0) { document.getElementById('auto-timer').innerText = `COOLDOWN: ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}`; setTimeout(updateAutoCooldown, 1000); }
+        else { document.getElementById('auto-btn').disabled = false; document.getElementById('auto-timer').innerText = "READY"; }
+    }
+
+    function simplifyRadical(n) { if (n === 0) return "√0"; let a = 1, b = n; for (let i = 2; i * i <= b; i++) { while (b % (i * i) === 0) { a *= i; b /= (i * i); } } return b === 1 ? a.toString() : (a === 1 ? `√${b}` : `${a}√${b}`); }
+
+    function checkCheat() {
+        const box = document.getElementById('cheat-box');
+        const code = box.value.toUpperCase();
+        const cMap = { "Q1JBWlkxMDBC": 100000000000, "Q1JBWlkxMEs=": 10000, "Q1JBWksyMEs=": 20000, "Q1JBWllDTElDS0VS": 10 };
+        Object.keys(cMap).forEach(k => {
+            if(atob(k) === code && !usedCodes[code]) {
+                if(code === "CRAZYCLICKER") allTimeCount += 10; else allTimeCount = cMap[k];
+                lastClickTime = Date.now();
+                usedCodes[code] = true; localStorage.setItem('usedCodes', JSON.stringify(usedCodes));
+                box.value = ""; updateUI();
+            }
+        });
+    }
+
+    function toggleDark() { localStorage.setItem('darkMode', document.getElementById('dark-toggle').checked); document.body.classList.toggle('dark-mode'); }
+    function sendFeedback() { window.location.href = `mailto:avishayowitz@://gmail.com Clicker Feedback&body=Score: ${allTimeCount}`; }
+    function toggleModal(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
+    function resetSession() { count = 0; updateUI(); }
+    function nuclearReset() { if(confirm("Wipe all data?")) { localStorage.clear(); location.reload(); } }
+
+    if(localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.getElementById('dark-toggle').checked = true; }
+    updateUI();
+</script>
+</body>
+</html>
