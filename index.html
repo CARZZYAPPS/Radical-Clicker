@@ -92,7 +92,7 @@
         <p><b>1. Radical Logic:</b> Session score is simplified (e.g., 12 = 2√3).</p>
         <p><b>2. Progression:</b> 1k clicks = +10 Power, 10k clicks = +20 Power.</p>
         <p><b>3. Auto-Clicker:</b> 100B clicks to unlock. 10 CPS for 60s.</p>
-        <p><b>4. Boss Mode:</b> Press <b>'B'</b> to hide game.</p>
+        <p><b>4. Boss Mode:</b> Press <b>'I'</b> to hide game.</p>
         <button onclick="toggleModal('rules-modal', false)" style="width:100%; padding:10px; cursor:pointer; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:bold;">Close Guide</button>
     </div>
 </div>
@@ -186,7 +186,7 @@
     function nuclearReset() { if(confirm("Clear all data?")) { localStorage.clear(); location.reload(); } }
 
     window.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 'b') {
+        if (e.key.toLowerCase() === 'i') {
             bossActive = !bossActive;
             document.getElementById('boss-overlay').style.display = bossActive ? 'block' : 'none';
         }
