@@ -86,9 +86,9 @@
 <div id="rules-modal" class="modal-overlay">
     <div class="modal-content">
         <h2>Official Game Guide</h2>
-        <p><b>1. Radical Logic:</b> Session score is simplified (e.g., 12 = 2√3).</p>
-        <p><b>2. Progression:</b> 1k clicks = +10 Power, 10k clicks = +20 Power.</p>
-        <p><b>3. Auto-Clicker:</b> 100B clicks to unlock. 10 CPS for 60s.</p>
+        <p><b>1. Counter:</b> Session score is simplified (e.g., 12 = 2√3).</p>
+        <p><b>2. Progression:</b> 1,000 clicks = +10 Power, 10,000 clicks = +20 Power.</p>
+        <p><b>3. Auto-Clicker:</b> 100,000 clicks to unlock. 10 CPS for 60s.</p>
         <p><b>4. Boss Mode:</b> Press <b>'I'</b> to hide game.</p>
         <button onclick="toggleModal('rules-modal', false)" style="width:100%; padding:10px; cursor:pointer; background:#2563eb; color:white; border:none; border-radius:8px; font-weight:bold;">Close Guide</button>
     </div>
@@ -141,8 +141,8 @@
         document.getElementById('power-level').innerText = `Click Power: +${getClickPower()}`;
         
         // Auto clicker lock status
-        if (allTimeCount < 100000000000) {
-            document.getElementById('auto-timer').innerText = "LOCKED (Need 100B)";
+        if (allTimeCount < 100000) {
+            document.getElementById('auto-timer').innerText = "LOCKED (Need 100K)";
         } else if (!autoActive) {
             document.getElementById('auto-timer').innerText = "READY";
         }
@@ -153,7 +153,7 @@
 
     // --- Systems ---
     function startAutoClicker() {
-        if (allTimeCount < 100000000000) return alert("Not enough clicks!");
+        if (allTimeCount < 100000) return alert("⚠️Not enough clicks!");
         if (autoActive) return;
 
         autoActive = true;
