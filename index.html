@@ -110,7 +110,6 @@
     let autoActive = false;
     let bossActive = false;
     let autoInterval;
-    let timer;
 
     // --- Core Logic ---
     function manualIncrement() {
@@ -174,17 +173,14 @@
             count += 10;
             allTimeCount += 10;
             document.getElementById('auto-timer').innerText = timeLeft + "s REMAINING";
+          timeLeft--;
+          document.getElementById('auto-timer').innerText = timeLeft + "s REMAINING";            
             updateUI();
             if (timeLeft <= 0) stopAutoClicker();
         }, 100);
-      timer = setInterval(() => {
-          timeLeft--;
-          document.getElementById('auto-timer').innerText = timeLeft + "s REMAINING";
-    }, 1000);
 
     function stopAutoClicker() {
         clearInterval(autoInterval);
-        clearInterval(timer);
         autoActive = false;
         document.body.classList.remove('auto-active');
     }
