@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +74,7 @@
     
     <div id="auto-container" style="margin-bottom: 10px;">
         <button id="auto-btn" onclick="startAutoClicker()" style="background: #db2777; color: white; width: 100%; padding: 10px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">START AUTO (60s)</button>
-        <div id="auto-timer" style="font-size:0.7rem; color:#be185d; font-weight: bold; margin-top:5px;">LOCKED (Need 100B)</div>
+        <div id="auto-timer" style="font-size:0.7rem; color:#be185d; font-weight: bold; margin-top:5px;">LOCKED (Need 100K)</div>
     </div>
     
     <button class="btn-click" onclick="manualIncrement()">CLICK!</button>
@@ -109,7 +110,8 @@
     let lastClickTime = parseInt(localStorage.getItem('lastClickTime')) || Date.now();
     let autoActive = false;
     let bossActive = false;
-    let autoInterval;
+    let autoClicker;
+    let autoClickerTimer;
 
     // --- Core Logic ---
     function manualIncrement() {
@@ -169,18 +171,23 @@
         document.body.classList.add('auto-active');
         let timeLeft = 60;
 
-        autoInterval = setInterval(() => {
-            count += 10;
-            allTimeCount += 10;
-            document.getElementById('auto-timer').innerText = timeLeft + "s REMAINING";
-          timeLeft--;
-          document.getElementById('auto-timer').innerText = timeLeft + "s REMAINING";            
+        autoClicker = setInterval(() => {
+            count += 20;
+            allTimeCount += 20;           
             updateUI();
-            if (timeLeft <= 0) stopAutoClicker();
         }, 100);
 
+        autoClickerTimer = setInterval(() => {
+          timeLeft--;
+          document.getElementById('auto-timer').innerText = timeLeft + "s REMAINING"; 
+          if (timeLeft <= 0) stopAutoClicker();
+        }, 1000);
+    }
     function stopAutoClicker() {
-        clearInterval(autoInterval);
+        clearInterval(autoClicker);
+        clearInterval(autoClickerTimer);
+        timeLeft = 60;
+        document.getElementById('auto-timer').innerText = "READY";
         autoActive = false;
         document.body.classList.remove('auto-active');
     }
